@@ -12,45 +12,6 @@ from utils import read_config, save_config
 
 THRESHOLD = 60000
 
-# bulk_send_mail(mailer, extracts, month, year)
-# send mails by information from extracts, returns None
-# params:
-#   mailer      : Mailer object
-#   extracts    : list of dict
-#                   [{
-#                       "email": String,
-#                       "jabatan": String,
-#                       "data": {
-#                           "Nomor Telepon": String,
-#                           "Unit": String,
-#                           ... optional keys ...,
-#                           "Subtotal": String,
-#                           "PPN": String,
-#                           "Total": String
-#                       }
-#                   }]
-#   month       : int or String as month of bill
-#   year        : int as year of bill
-def bulk_send_mail(mailer, extracts, month, year):
-
-    length = len(extracts)
-    count = 0
-    print(f"0/{length} terkirim", end="")
-
-    for extr in extracts:
-        
-        real_email = extr["email"]
-        # real_email = "maryam.namira@angkasapura2.co.id"
-        mock_email = "fakegags+" + real_email.lower().replace("angkasapura2.co.id", "gmail.com")
-        extr["email"] = mock_email
-
-        mailer.send_mail(extr, month, year)
-        count += 1
-        print(f"\r{count}/{length} terkirim, terakhir {extr['email']}              ", end="")
-
-        sleep(1)
-
-    print()
     
 # get_spreadsheet_path_from_user()
 # get path to monthly bill file from user, returns path to file.
