@@ -2,6 +2,7 @@ from errors import *
 
 from bs4 import BeautifulSoup
 import xlrd
+import openpyxl
 import csv
 from io import StringIO
 import pandas as pd
@@ -24,6 +25,9 @@ class Spreadsheet(object):
 
         headers = self.table[0]
         rows = self.table[1:]
+
+        # for row in self.table:
+        #     print(row)
         self.df = pd.DataFrame(rows, columns=headers)
 
     def parse_to_list(self):
@@ -33,7 +37,7 @@ class Spreadsheet(object):
         elif self.file_type == "XML":
             self.xml_parse()
 
-        elif self.file_type == "XL":
+        elif self.file_type == "XLS" or self.file_type == "XLSX":
             self.xl_parse()
 
         else:
@@ -53,45 +57,69 @@ class Spreadsheet(object):
                         self.table[-1].append(cell)
             if not self.table:
                 raise ExcelDecodeError
-            self.file_type = "XL"
+            self.file_type = "XLS"
             f.close()
 
-        except:
-            print("EXCEPTED---------------------------")
-            file = open(self.filename, "r")
-            self.raw = file.read()
-            file.close()
+        except xlrd.biffh.XLRDError as e:
+            if "xlsx" in str(e):
+                path, source_filename = os.path.split(self.filename)
+                new_filename = os.path.splitext(self.filename)[0] + ".xlsx"
+                os.rename(self.filename, new_filename)
+                self.filename = new_filename
 
-            self.soup = BeautifulSoup(self.raw, 'xml')
-            self.tr0s = self.soup.find_all('Row')
-            if self.tr0s:
-                self.file_type = "XML"
-                return
+                wb = openpyxl.load_workbook(filename=self.filename)
+                ws = wb[wb.sheetnames[0]]
+                rows_iter = ws.iter_rows(max_col = ws.max_column, max_row = ws.max_row)
+                table = [[cell.value for cell in row] for row in rows_iter]
+                for row in table:
+                    def isEmpty(x):
+                        if x is None:
+                            return True
+                        elif isinstance(x, str):
+                            if not x.strip():
+                                return True
+                        else:
+                            return False
+                    while row and isEmpty(row[-1]):
+                        row.pop()
+                self.table = table
+                self.file_type = "XLSX"
+
+            elif "BOF" in str(e):
+                file = open(self.filename, "r")
+                self.raw = file.read()
+                file.close()
+
+                self.soup = BeautifulSoup(self.raw, 'xml')
+                self.tr0s = self.soup.find_all('Row')
+                if self.tr0s:
+                    self.file_type = "XML"
+                    return
+                    
+                self.soup = BeautifulSoup(self.raw, 'html.parser')
+                self.tr0s = self.soup.find_all('tr')   
+                if self.tr0s:
+                    self.file_type = "HTML"
+                    return
+
+                # find delimiter
+                self.file_type = "CSV"
+                nl = self.raw.index("\n")
+                nl = self.raw.index("\n", nl)
+                check = self.raw.index("|", 0, nl)
+                if check != -1:
+                    self.delimiter = "|"
+                    return
+                check = self.raw.index(",", 0, nl)
+                if check != -1:
+                    self.delimiter = ","
+                    return
+                check = self.raw.index(";", 0, nl)
+                if check != -1:
+                    self.delimiter = ";"
+                    return
                 
-            self.soup = BeautifulSoup(self.raw, 'html.parser')
-            self.tr0s = self.soup.find_all('tr')   
-            if self.tr0s:
-                self.file_type = "HTML"
-                return
-
-            # find delimiter
-            self.file_type = "CSV"
-            nl = self.raw.index("\n")
-            nl = self.raw.index("\n", nl)
-            check = self.raw.index("|", 0, nl)
-            if check != -1:
-                self.delimiter = "|"
-                return
-            check = self.raw.index(",", 0, nl)
-            if check != -1:
-                self.delimiter = ","
-                return
-            check = self.raw.index(";", 0, nl)
-            if check != -1:
-                self.delimiter = ";"
-                return
-            
-            raise FileTypeError # file cannot be read
+                raise FileTypeError # file cannot be read
 
     def html_parse(self):
         self.table = []
@@ -153,22 +181,21 @@ class Spreadsheet(object):
             if len(self.table[i]) >= threshold:
                 start = i
                 break
+        if start == -1:
+            raise StartNotFound
 
         stop = -1
         for i in range(len(self.table)-1, -1, -1):
-            if len(self.table[i]) >= threshold:
-                stop = i
+            if len(self.table[i]) <= threshold:
+                stop = i - 1
                 break
+        if stop == -1:
+            stop = len(self.table) - 1
 
         return start, stop
 
     def crop_table(self):
         start, stop = self.start_stop_index()
-
-        if start == -1:
-            raise StartNotFound
-        if stop == -1:
-            raise StopNotFound
 
         self.table = self.table[start: stop+1]
 
@@ -176,8 +203,8 @@ class Spreadsheet(object):
         for i in range(len(self.table)):
             error = len(self.table[i]) - len(self.table[0])
             if error < 0:
-                for i in range(-error):
-                    self.table[i].append[""]
+                for j in range(-error):
+                    self.table[i].append("")
             if error > 0:
                 raise TableCropError
 
@@ -188,6 +215,7 @@ class Spreadsheet(object):
 
     def calculate_total(self):
         def str_to_int(x):
+            # print(x)
             if isinstance(x, int):
                 return x
             out = int("".join(re.findall(r'\d+', x)))
