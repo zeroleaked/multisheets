@@ -263,9 +263,10 @@ class Spreadsheet(object):
         return extracts
 
     def export_csv(self, date_str):
-        filename, file_extension = os.path.splitext(self.filename)
-        csv_filename = filename + ".csv"
-        
+
+        path, source_filename = os.path.split(self.filename)
+        csv_filename = os.path.join(path, "[DB_FORMATTED]" + os.path.splitext(source_filename)[0] + ".csv")
+
         number_label = self.df.columns[self.number_index]
         minimal_df = self.df[[ number_label, "__Total_Int__" ]].copy()
         minimal_df["id"] = "NULL"
@@ -273,13 +274,6 @@ class Spreadsheet(object):
         minimal_df = minimal_df[["id", number_label, "date", "__Total_Int__" ]]
         minimal_df.to_csv(csv_filename, index=False, header=False)
         print("CSV disimpan di :", csv_filename)
-
-        # f = open(csv_filename, "w")
-        # writer = csv.writer(f)
-        # for row in self.table[1:]:
-        #     writer.writerow([  ])
-        # f.close()
-
 
 
 
