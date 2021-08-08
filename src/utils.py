@@ -1,6 +1,6 @@
 # {
 #     "contacts" : xlsx_path,
-#     "last_data_dir" : last source dir,
+#     "last_monthly_dir" : last source dir,
 #     "tables" : [
 #         {
 #             "columns" : [column_name],
@@ -22,7 +22,7 @@ import os
 def create_config():
     config = {
         "contacts" : False,
-        "last_data_dir" : False,
+        "last_monthly_dir" : False,
         "tables" : []
         }
     with open('config.json', 'w') as outfile:
