@@ -294,13 +294,13 @@ class Spreadsheet(object):
 
         number_label = self.df.columns[self.number_index]
         minimal_df = self.df[[ number_label, "__Total_Int__" ]].copy()
-        minimal_df["id"] = "NULL"
+        minimal_df["empty"] = "NULL"
         minimal_df["date"] = date_str
-        minimal_df = minimal_df[["id", number_label, "date", "__Total_Int__" ]]
+        minimal_df = minimal_df[["empty", number_label, "date", "__Total_Int__", "empty" ]]
+        minimal_df.columns = ["id", "notel", "date", "total", "created"]
         minimal_df.to_csv(csv_filename, index=False, header=False)
         print("CSV disimpan di :", csv_filename)
-
-
+        self.minimal_df = minimal_df
 
 if __name__ == "__main__":
 

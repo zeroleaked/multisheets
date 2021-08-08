@@ -1,7 +1,10 @@
 from multisheet_spreadsheet import Spreadsheet
 import interface
+import mysql.connector
+
 
 if __name__ == "__main__":
+
     path_ss = interface.get_spreadsheet_path_from_user()
     spreadsheet = Spreadsheet(path_ss)
 
@@ -23,3 +26,23 @@ if __name__ == "__main__":
     date = str(year) + '-' + month_str + '-' + "25"
 
     spreadsheet.export_csv(date)
+    
+
+    #add to database
+    cnx = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="telepon"
+    )
+    cursor = cnx.cursor()
+    insert_stmt = (
+        "INSERT INTO tagihan (notel, bulan, total) " +
+        "VALUES (%s, %s, %s);"
+    )
+    count = 0
+    for i, row in spreadsheet.minimal_df.iterrows():
+        cursor.execute(insert_stmt, (row["notel"], date, row["total"]))
+        count += 1
+    cnx.commit()
+    print(count, "baris telah ditambah ke database")
