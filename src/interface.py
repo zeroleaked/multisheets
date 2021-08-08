@@ -52,9 +52,9 @@ def bulk_send_mail(mailer, extracts, month, year):
 
     print()
     
-# get_spreadsheet_from_user()
-# get path to monthly bill file from user, returns Spreadsheet object.
-def get_spreadsheet_from_user():
+# get_spreadsheet_path_from_user()
+# get path to monthly bill file from user, returns path to file.
+def get_spreadsheet_path_from_user():
     print("Pilih data tagihan")
 
     root = Tk()
@@ -72,8 +72,7 @@ def get_spreadsheet_from_user():
     save_config("last_monthly_dir", table_dir)
 
     print("Data tagihan :", path_ss)
-    spreadsheet = Spreadsheet(path_ss)
-    return spreadsheet
+    return path_ss
 
 # get_table_config_from_user(headers, sample)
 # params:

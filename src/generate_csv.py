@@ -1,7 +1,9 @@
+from multisheet_spreadsheet import Spreadsheet
 import interface
 
 if __name__ == "__main__":
-    spreadsheet = interface.get_spreadsheet_from_user()
+    path_ss = interface.get_spreadsheet_path_from_user()
+    spreadsheet = Spreadsheet(path_ss)
 
     indexes = interface.get_table_config_from_mem(spreadsheet.table[0])
     if indexes:
@@ -19,5 +21,5 @@ if __name__ == "__main__":
     if len(month_str) < 2:
         month_str = '0' + month_str
     date = str(year) + '-' + month_str + '-' + "25"
-    
+
     spreadsheet.export_csv(date)
