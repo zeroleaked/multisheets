@@ -25,9 +25,7 @@ class Spreadsheet(object):
 
         headers = self.table[0]
         rows = self.table[1:]
-
-        # for row in self.table:
-        #     print(row)
+        
         self.df = pd.DataFrame(rows, columns=headers)
 
     def parse_to_list(self):
@@ -185,7 +183,7 @@ class Spreadsheet(object):
             raise StartNotFound
 
         stop = -1
-        for i in range(len(self.table)-1, -1, -1):
+        for i in range(start, len(self.table)):
             if len(self.table[i]) <= threshold:
                 stop = i - 1
                 break
@@ -215,7 +213,6 @@ class Spreadsheet(object):
 
     def calculate_total(self):
         def str_to_int(x):
-            # print(x)
             if isinstance(x, int):
                 return x
             out = int("".join(re.findall(r'\d+', x)))
