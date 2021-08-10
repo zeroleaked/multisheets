@@ -7,7 +7,6 @@ import getpass
 from datetime import date
 
 from multisheet_spreadsheet import Spreadsheet
-from mailer import Mailer
 from utils import read_config, save_config
 
 THRESHOLD = 60000

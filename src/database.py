@@ -1,7 +1,7 @@
-from multisheet_spreadsheet import Spreadsheet
-import interface
 import mysql.connector
 
+from multisheet_spreadsheet import Spreadsheet
+import interface
 
 if __name__ == "__main__":
 
