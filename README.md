@@ -6,6 +6,7 @@ Accepts xml, html, xls, xlsx and csv with ',', '|' and ';' delimiter.
 Uploads to MySQL database in localhost with user "root" and password "", can be changed in src/database.py.
 
 ## Installation
+    pip install -r requirements.txt
 For Windows OS, requires additional installation outside of requirements.txt for MySQL Python connector that can be downloaded [here](https://dev.mysql.com/downloads/connector/python/).
 
 ## Execution
