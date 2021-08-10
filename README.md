@@ -1,5 +1,6 @@
 # multisheets
-A python spreadsheet parser to serialize multiple formats of bill into a database of columns of 1) telephone number and 2) monthly bill total after 10% VAT. 
+A python spreadsheet parser to serialize multiple formats of bill into a database of columns of 1) telephone number and 2) monthly bill total after 10% VAT.
+Semiautomated and requires mapping by user input for every **new** table formats. Inputted table format mappings are saved at config.json.
 
 Accepts xml, html, xls, xlsx and csv with ',', '|' and ';' delimiter.
 
