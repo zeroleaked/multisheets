@@ -42,7 +42,8 @@ if __name__ == "__main__":
     )
     count = 0
     for i, row in spreadsheet.minimal_df.iterrows():
-        cursor.execute(insert_stmt, (row["notel"], date, row["total"]))
-        count += 1
+        if row["notel"] and row["total"]:
+            cursor.execute(insert_stmt, (row["notel"], date, row["total"]))
+            count += 1
     cnx.commit()
     print(count, "baris telah ditambah ke database")
