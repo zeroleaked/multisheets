@@ -9,11 +9,19 @@ import pandas as pd
 import re
 import csv
 import os
+import shutil
 
 class Spreadsheet(object):
 
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, source_path):
+        cache_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cache")
+        if os.path.exists(cache_path):
+            shutil.rmtree(cache_path)
+        os.mkdir(cache_path)
+
+        source_dir, source_filename = os.path.split(source_path)
+        self.filename = os.path.join(cache_path, source_filename)
+        shutil.copyfile(source_path, self.filename)
 
         self.open_text()     
 
@@ -59,6 +67,7 @@ class Spreadsheet(object):
             f.close()
 
         except xlrd.biffh.XLRDError as e:
+            f.close()
             if "xlsx" in str(e):
                 path, source_filename = os.path.split(self.filename)
                 new_filename = os.path.splitext(self.filename)[0] + ".xlsx"

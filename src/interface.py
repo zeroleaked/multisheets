@@ -143,10 +143,10 @@ def get_month(type):
     month_name = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
     
     today = date.today()
-    month = input(f"Bulan tagihan ({today.month - 1}) : ")
+    month = input(f"Bulan tagihan ({today.month}) : ")
     year = input(f"Tahun tagihan ({today.year}) : ")
     if not month:
-        month = today.month - 1
+        month = today.month
     if not year:
         year = today.year
 
